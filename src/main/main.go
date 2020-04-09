@@ -101,10 +101,18 @@ func addHamster(c echo.Context) error {
 	return c.String(http.StatusOK, "we got your hamster")
 }
 
+// func mainAdmin(c echo.Context) error {
+// 	return c.String(http.StatusOK, "horay you are on the secret admin main page!")
+// }
+
 func main() {
   fmt.Println("Welcome")
   
 	e := echo.New()
+
+	// g := e.Group("/admin")
+
+	// g.Get("/main", mainAdmin)
 
 	e.GET("/", yallo)
 	e.GET("/cats/:data", getCats) //http://localhost:8080/cats/string?name="myName"&type="myTytpe"
