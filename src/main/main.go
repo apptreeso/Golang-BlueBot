@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 
 	"github.com/labstack/echo"
+	"github.com/labstack/echo/middleware"
 )
 
 type Cat struct {
@@ -112,7 +113,12 @@ func main() {
 
 	g := e.Group("/admin")
 
-	g.GET("/main", mainAdmin)
+	// this logs the server interaction
+	g.Use(middleware.LoggerWithConfig(middleware.LoggerConfig{
+		Format: `[${time_rfc3339}] ${status} ${method} ${host}${path} ${latency_human}` + "\n",
+	}))
+
+	g.GET("/main", mainAdmin) //localhost:8080/admin/main
 
 	e.GET("/", yallo)
 	e.GET("/cats/:data", getCats) //http://localhost:8080/cats/string?name="myName"&type="myTytpe"
