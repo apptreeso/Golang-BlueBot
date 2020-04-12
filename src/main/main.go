@@ -1,31 +1,33 @@
 package main
 
 import (
-  "fmt"
-	"net/http"
+	"encoding/json"
+	"fmt"
 	"io/ioutil"
 	"log"
-	"encoding/json"
+	"net/http"
 
 	"github.com/labstack/echo"
 	"github.com/labstack/echo/middleware"
 )
 
+// Cat structure
 type Cat struct {
 	Name string `json:"name"`
 	Type string `json:"type"`
 }
 
+// Dog structure
 type Dog struct {
 	Name string `json:"name"`
 	Type string `json:"type"`
 }
 
+// Hamster structure
 type Hamster struct {
 	Name string `json:"name"`
 	Type string `json:"type"`
 }
-
 
 func yallo(c echo.Context) error {
 	return c.String(http.StatusOK, "Hello world")
@@ -37,11 +39,11 @@ func getCats(c echo.Context) error {
 
 	dataType := c.Param("data")
 
-	if (dataType == "string") {
-		return c.String(http.StatusOK, fmt.Sprintf("your cat name is %s\nand type is: %s", catName, catType))	
+	if dataType == "string" {
+		return c.String(http.StatusOK, fmt.Sprintf("your cat name is %s\nand type is: %s", catName, catType))
 	}
 
-	if (dataType == "json") {
+	if dataType == "json" {
 		return c.JSON(http.StatusOK, map[string]string{
 			"name": catName,
 			"type": catType,
@@ -76,7 +78,7 @@ func addCat(c echo.Context) error {
 
 func addDog(c echo.Context) error {
 	dog := Dog{}
-	
+
 	defer c.Request().Body.Close()
 
 	err := json.NewDecoder(c.Request().Body).Decode(&dog)
@@ -107,8 +109,8 @@ func mainAdmin(c echo.Context) error {
 }
 
 func main() {
-  fmt.Println("Welcome")
-  
+	fmt.Println("Welcome")
+
 	e := echo.New()
 
 	g := e.Group("/admin")
@@ -118,13 +120,32 @@ func main() {
 		Format: `[${time_rfc3339}] ${status} ${method} ${host}${path} ${latency_human}` + "\n",
 	}))
 
+	g.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
+		// g.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (error, bool) {
+		// check in the DB
+		if username == "jack" && password == "1234" {
+			return true, nil
+		}
+
+		return false, nil
+	}))
+
+	g.Use(middleware.BasicAuth(func(username, password string, c echo.Context) (bool, error) {
+		// check in the DB
+		if username == "jack" && password == "1234" {
+			return true, nil
+		}
+
+		return false, nil
+	}))
+
 	g.GET("/main", mainAdmin) //localhost:8080/admin/main
 
 	e.GET("/", yallo)
 	e.GET("/cats/:data", getCats) //http://localhost:8080/cats/string?name="myName"&type="myTytpe"
 
-	e.POST("/cats", addCat)	//{"name": "fishmaster",	"type": "cat-fish"}
-	e.POST("/dogs", addDog)	//{"name": "doggymaster",	"type": "dog-fish"}
+	e.POST("/cats", addCat)         //{"name": "fishmaster",	"type": "cat-fish"}
+	e.POST("/dogs", addDog)         //{"name": "doggymaster",	"type": "dog-fish"}
 	e.POST("/hamsters", addHamster) //{"name": "hamster",	"type": "hamster-fish"}
 
 	e.Start(":8080")
