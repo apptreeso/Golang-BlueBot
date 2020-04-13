@@ -140,6 +140,7 @@ func main() {
 	}))
 
 	g.GET("/main", mainAdmin) //localhost:8080/admin/main
+	g.GET("/main", mainAdmin) //localhost:8080/admin/main
 
 	e.GET("/", yallo)
 	e.GET("/cats/:data", getCats) //http://localhost:8080/cats/string?name="myName"&type="myTytpe"
