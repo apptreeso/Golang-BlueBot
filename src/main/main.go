@@ -149,4 +149,6 @@ func main() {
 	e.POST("/hamsters", addHamster) //{"name": "hamster",	"type": "hamster-fish"}
 
 	e.Start(":8080")
+
+	// test
 }
